@@ -3,74 +3,73 @@
  * MIT Licensed.
  */
 // Inspired by base2 and Prototype
-(function(){
-	var initializing = false;
 
-	// The base JQClass implementation (does nothing)
-	window.JQClass = function(){};
+var initializing = false;
 
-	// Collection of derived classes
-	JQClass.classes = {};
- 
-	// Create a new JQClass that inherits from this class
-	JQClass.extend = function extender(prop) {
-		var base = this.prototype;
+// The base JQClass implementation (does nothing)
+const JQClass = function(){};
 
-		// Instantiate a base class (but only create the instance,
-		// don't run the init constructor)
-		initializing = true;
-		var prototype = new this();
-		initializing = false;
+// Collection of derived classes
+JQClass.classes = {};
 
-		// Copy the properties over onto the new prototype
-		for (var name in prop) {
-			// Check if we're overwriting an existing function
-			prototype[name] = typeof prop[name] == 'function' &&
-				typeof base[name] == 'function' ?
-				(function(name, fn){
-					return function() {
-						var __super = this._super;
+// Create a new JQClass that inherits from this class
+JQClass.extend = function extender(prop) {
+	var base = this.prototype;
 
-						// Add a new ._super() method that is the same method
-						// but on the super-class
-						this._super = function(args) {
-							return base[name].apply(this, args || []);
-						};
+	// Instantiate a base class (but only create the instance,
+	// don't run the init constructor)
+	initializing = true;
+	var prototype = new this();
+	initializing = false;
 
-						var ret = fn.apply(this, arguments);				
+	// Copy the properties over onto the new prototype
+	for (var name in prop) {
+		// Check if we're overwriting an existing function
+		prototype[name] = typeof prop[name] == 'function' &&
+			typeof base[name] == 'function' ?
+			(function(name, fn){
+				return function() {
+					var __super = this._super;
 
-						// The method only need to be bound temporarily, so we
-						// remove it when we're done executing
-						this._super = __super;
-
-						return ret;
+					// Add a new ._super() method that is the same method
+					// but on the super-class
+					this._super = function(args) {
+						return base[name].apply(this, args || []);
 					};
-				})(name, prop[name]) :
-				prop[name];
+
+					var ret = fn.apply(this, arguments);
+
+					// The method only need to be bound temporarily, so we
+					// remove it when we're done executing
+					this._super = __super;
+
+					return ret;
+				};
+			})(name, prop[name]) :
+			prop[name];
+	}
+
+	// The dummy class constructor
+	function JQClass() {
+		// All construction is actually done in the init method
+		if (!initializing && this._init) {
+			this._init.apply(this, arguments);
 		}
+	}
 
-		// The dummy class constructor
-		function JQClass() {
-			// All construction is actually done in the init method
-			if (!initializing && this._init) {
-				this._init.apply(this, arguments);
-			}
-		}
+	// Populate our constructed prototype object
+	JQClass.prototype = prototype;
 
-		// Populate our constructed prototype object
-		JQClass.prototype = prototype;
+	// Enforce the constructor to be what we expect
+	JQClass.prototype.constructor = JQClass;
 
-		// Enforce the constructor to be what we expect
-		JQClass.prototype.constructor = JQClass;
+	// And make this class extendable
+	JQClass.extend = extender;
 
-		// And make this class extendable
-		JQClass.extend = extender;
+	return JQClass;
+};
 
-		return JQClass;
-	};
-})();
-
-(function($) { // Ensure $, encapsulate
+export default function($) { // Ensure $, encapsulate
 
 	/** Abstract base class for collection plugins v1.0.1.
 		Written by Keith Wood (kbwood{at}iinet.com.au) December 2013.
@@ -341,4 +340,4 @@
 		}
 	};
 
-})(jQuery);
+};
