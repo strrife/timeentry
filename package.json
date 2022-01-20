@@ -1,0 +1,19 @@
+{
+  "name": "timeentry",
+  "version": "1.0.0",
+  "description": "jQuery Time Entry that works fine with Webpack/Rollup =================",
+  "main": "jquery.plugin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/strrife/timeentry.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/strrife/timeentry/issues"
+  },
+  "homepage": "https://github.com/strrife/timeentry#readme"
+}
